@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Job, JobApplication
-from .serializers import JobSerializer, JobApplicationSerializer 
+from .serializers import JobSerializer, JobApplicationSerializer, SubscriptionSerializer 
 from .serializers import SubscriptionCreateSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -122,3 +122,14 @@ class SubscriptionCreateView(generics.CreateAPIView):
         else:
             new_subscription = serializer.save(recruiter=self.request.user)
             new_subscription.set_expiration_date()
+
+class SubscriptionShowView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SubscriptionSerializer
+
+    def get_object(self):
+        user = self.request.user
+        try:
+            return Subscription.objects.get(recruiter=user)
+        except Subscription.DoesNotExist:
+            return None

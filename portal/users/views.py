@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login, logout
+
 from .serializers import UserProfileSerializer, UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 
 
 class UserRegistrationView(APIView):
@@ -47,6 +49,7 @@ class UserLoginView(APIView):
         # Generate a new token for the user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
+    
 
         # Perform login if the user is authenticated
         serializer = UserLoginSerializer(user)
@@ -54,14 +57,25 @@ class UserLoginView(APIView):
         data['token'] = access_token
         
         if user.role == 'admin':
-            data['dashboard_url'] = '/admin-dashboard/'  # Replace with the admin dashboard URL
+            data['role'] = 'admin'  # Replace with the admin dashboard URL
         elif user.role == 'user':
-            data['dashboard_url'] = '/user-dashboard/'  # Replace with the user dashboard URL
+            data['role'] = 'user'  # Replace with the user dashboard URL
         elif user.role == 'recruiter':
-            data['dashboard_url'] = '/recruiter-dashboard/'  # Replace with the recruiter dashboard URL
+            data['role'] = 'recruiter'  # Replace with the recruiter dashboard URL
+
+        data['username']=user.username
 
                
-        return Response(data, status=status.HTTP_200_OK)
+        response=Response(data, status=status.HTTP_200_OK)
+        response.set_cookie('access_token',access_token,httponly=True)
+        return response
+class UserLogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        # Clear the token from the client's storage
+        response = Response({'detail': 'Logout successful'})
+        response.delete_cookie('access_token')  # Clear the access token cookie
+        return response
         
 @api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
