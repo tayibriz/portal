@@ -24,3 +24,11 @@ class User(AbstractUser):
     certifications = models.URLField(blank=True)
     personal_details = models.TextField(blank=True)
     languages_known = models.TextField(blank=True)
+
+    contact_info = models.TextField(blank=True)
+    recruitment_specialities = models.TextField(blank=True)
+    client_company_list = models.TextField(blank=True)
+    social_media_links = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.username

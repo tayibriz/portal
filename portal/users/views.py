@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login, logout
 
-from .serializers import UserProfileSerializer, UserRegistrationSerializer, UserLoginSerializer
+from .serializers import RecruiterProfileSerializer, UserProfileSerializer, UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
@@ -84,12 +84,23 @@ def user_profile(request):
     user = request.user
     
     if request.method == 'GET':
-        serializer = UserProfileSerializer(user)
+        if user.role == 'recruiter':
+            serializer = RecruiterProfileSerializer(user)
+        else:
+            serializer = UserProfileSerializer(user)
         return Response(serializer.data)
     
     elif request.method == 'PUT':
-        serializer = UserProfileSerializer(user, data=request.data)
+        if user.role == 'recruiter':
+            serializer = RecruiterProfileSerializer(user, data=request.data)
+        else:
+            serializer = UserProfileSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+
+
+
+
+
