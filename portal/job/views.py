@@ -12,7 +12,12 @@ from datetime import datetime,date,timedelta
 from .models import Subscription
 from django_filters import rest_framework as filters
 from .filters import JobFilter 
-
+from django.shortcuts import render
+from users.models import User
+from .models import Job
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .utils import get_job_recommendations
 
 
 
@@ -133,3 +138,15 @@ class SubscriptionShowView(generics.RetrieveAPIView):
             return Subscription.objects.get(recruiter=user)
         except Subscription.DoesNotExist:
             return None
+@api_view(['GET'])
+def recommend_jobs(request, user_id):
+    user = User.objects.get(id=user_id)
+    user_profile = {
+        'skills': user.skills,
+    }
+    
+    recommended_jobs = get_job_recommendations(user_profile)
+    
+    serializer = JobSerializer(recommended_jobs, many=True)
+    
+    return Response({'recommended_jobs': serializer.data})

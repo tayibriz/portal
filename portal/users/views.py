@@ -64,6 +64,7 @@ class UserLoginView(APIView):
             data['role'] = 'recruiter'  # Replace with the recruiter dashboard URL
 
         data['username']=user.username
+        data['id']=user.id
 
                
         response=Response(data, status=status.HTTP_200_OK)

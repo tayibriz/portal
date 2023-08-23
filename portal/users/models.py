@@ -12,13 +12,15 @@ class User(AbstractUser):
     
 
     #userprofile
+    first_name=models.CharField(max_length=20,blank=True)
+    last_name=models.CharField(max_length=20,blank=True)
+
     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     profile_summary = models.TextField(blank=True)
-    key_skills = models.TextField(blank=True)
+    skills = models.TextField(blank=True)
     employment_details = models.TextField(blank=True)
     projects = models.TextField(blank=True)
-    it_skills = models.TextField(blank=True)
     education = models.TextField(blank=True)
     accomplishments = models.TextField(blank=True)
     certifications = models.URLField(blank=True)
