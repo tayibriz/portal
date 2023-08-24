@@ -1,11 +1,11 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from .models import Job
-from users.models import User  # Make sure you're importing the User model correctly
+from users.views import user_profile
 
 def get_job_recommendations(user_profile):
+    # Assuming user_profile is a dictionary containing user skills and preferences
     user_skills = user_profile.get('skills', '')
-    user_preferences = user_profile.get('preferences', '')  # Adjust the key based on your user profile data
     
     jobs = Job.objects.all()
     
@@ -14,7 +14,7 @@ def get_job_recommendations(user_profile):
     tfidf_vectorizer = TfidfVectorizer()
     tfidf_matrix = tfidf_vectorizer.fit_transform(job_descriptions)
     
-    user_vector = tfidf_vectorizer.transform([user_skills + " " + user_preferences])  # Combine skills and preferences
+    user_vector = tfidf_vectorizer.transform([user_skills])
     
     cosine_similarities = linear_kernel(user_vector, tfidf_matrix)
     
@@ -24,4 +24,3 @@ def get_job_recommendations(user_profile):
     recommended_jobs = [jobs[idx] for idx, _ in similar_jobs[:5]]  # Get top 5 recommendations
     
     return recommended_jobs
-
